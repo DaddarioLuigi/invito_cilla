@@ -104,15 +104,17 @@
     /* ---- Tipografia ---- */
     .content {
       position: relative; z-index: 2;
-      width: min(92vw, 620px); min-width: 0;
-      margin-inline: auto;
+      width: 100%; max-width: 620px; min-width: 0;
+      display: flex; flex-direction: column; align-items: center;
     }
     .content > * { max-width: 100%; overflow-wrap: break-word; }
 
     .kicker {
+      display: inline-block;
       font-size: clamp(.84rem, 3.4vw, 1.06rem);
       letter-spacing: .38em; text-transform: uppercase;
       color: var(--gold-ink); font-weight: 500;
+      padding-left: .38em;   /* compensa lo spazio finale del letter-spacing */
     }
 
     .headline {
@@ -122,26 +124,42 @@
       background: linear-gradient(175deg, var(--gold-lite) 0%, var(--gold) 46%, #8a6d1f 100%);
       -webkit-background-clip: text; background-clip: text;
       color: transparent;
-      padding: 0 .06em .14em;   /* spazio per le aste discendenti (g, ) */
+      padding: 0 .06em .14em;   /* spazio per le aste discendenti (g, y) */
+      width: fit-content; max-width: 100%;
+      text-align: center; text-wrap: balance;
     }
 
     .laurel-divider { width: clamp(172px, 52vw, 264px); height: auto; margin: clamp(1rem,4vw,1.6rem) auto; }
 
     .date {
       font-weight: 400; font-size: clamp(3.2rem, 15vw, 6.4rem);
-      letter-spacing: .04em;
+      line-height: 1.12; letter-spacing: .04em;
+      width: fit-content; max-width: 100%;
+      text-align: center;
+      padding-left: .04em;
     }
     .date .day { color: var(--gold); }
+    .date .time {
+      display: block; margin-top: .32em;
+      font-weight: 300; font-size: .56em;
+      color: var(--gold-ink); letter-spacing: .12em;
+      padding-left: .12em;
+      font-variant-numeric: tabular-nums;
+    }
 
     .place {
       font-weight: 500; font-size: clamp(2.6rem, 11vw, 4.8rem);
       line-height: 1.12; letter-spacing: .02em;
       text-wrap: balance;
+      width: fit-content; max-width: 100%;
+      text-align: center;
+      padding-left: .02em;
     }
     .place .city {
       display: block; margin-top: .32em;
       font-weight: 300; font-style: italic; font-size: .56em;
       color: var(--gold-ink); letter-spacing: .16em;
+      padding-left: .16em;
     }
 
     /* ---- Brillantini dorati ---- */
@@ -259,7 +277,7 @@
       <div class="content">
         <p class="kicker reveal">Save the date</p>
         <img class="laurel-divider reveal d1" src="assets/laurel-divider.svg" alt="" aria-hidden="true">
-        <p class="date reveal d2"><span class="day">01</span> agosto</p>
+        <p class="date reveal d2"><span class="day">01</span> agosto<span class="time">20:30</span></p>
       </div>
     </section>
 
@@ -275,10 +293,7 @@
       <div class="content">
         <p class="kicker reveal">Dove</p>
         <img class="laurel-divider reveal d1" src="assets/laurel-divider.svg" alt="" aria-hidden="true">
-        <p class="place reveal d2">
-          Villa Romanazzi
-          <span class="city">Bari</span>
-        </p>
+        <p class="place reveal d2">Villa<br>Romanazzi<span class="city">Bari</span></p>
       </div>
     </section>
 
