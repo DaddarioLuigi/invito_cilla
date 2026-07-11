@@ -267,6 +267,7 @@
         <source src="assets/invito.mp4" type="video/mp4">
       </video>
       <div class="scroll-hint" aria-hidden="true">
+        <span>scorri</span>
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 7l6 6 6-6"/>
           <path d="M6 13l6 6 6-6"/>
@@ -291,6 +292,7 @@
         <h1 class="headline reveal d2">Festeggia<br>con me</h1>
       </div>
       <div class="scroll-hint scroll-hint--light" aria-hidden="true">
+        <span>scorri</span>
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 7l6 6 6-6"/>
           <path d="M6 13l6 6 6-6"/>
@@ -313,6 +315,7 @@
         <p class="date reveal d2"><span class="day">01</span> agosto<span class="time">20:30</span></p>
       </div>
       <div class="scroll-hint scroll-hint--light" aria-hidden="true">
+        <span>scorri</span>
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 7l6 6 6-6"/>
           <path d="M6 13l6 6 6-6"/>
@@ -335,6 +338,7 @@
         <p class="place reveal d2">Villa<br>Romanazzi<span class="city">Bari</span></p>
       </div>
       <div class="scroll-hint scroll-hint--light" aria-hidden="true">
+        <span>scorri</span>
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 7l6 6 6-6"/>
           <path d="M6 13l6 6 6-6"/>
@@ -358,6 +362,7 @@
         Apri con Google Maps
       </a>
       <div class="scroll-hint" aria-hidden="true">
+        <span>scorri</span>
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 7l6 6 6-6"/>
           <path d="M6 13l6 6 6-6"/>
@@ -384,38 +389,6 @@
       }, { root: scroller, threshold: 0.55 });
       hintObserver.observe(section);
     });
-
-    /* ---- Auto-scroll tra sezioni ---- */
-    const AUTO_SCROLL_MS = 1500;
-    let autoScrollTimer = null;
-
-    function clearAutoScroll() {
-      if (autoScrollTimer) {
-        clearTimeout(autoScrollTimer);
-        autoScrollTimer = null;
-      }
-    }
-
-    function scheduleAdvanceFrom(sectionIndex) {
-      clearAutoScroll();
-      if (reduceMotion || sectionIndex >= sections.length - 1) return;
-
-      autoScrollTimer = setTimeout(() => {
-        sections[sectionIndex + 1].scrollIntoView({
-          behavior: reduceMotion ? 'auto' : 'smooth',
-          block: 'start'
-        });
-      }, AUTO_SCROLL_MS);
-    }
-
-    const autoScrollObserver = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        const index = sections.indexOf(e.target);
-        if (index > 0) scheduleAdvanceFrom(index);
-      });
-    }, { root: scroller, threshold: 0.6 });
-    sections.slice(1).forEach(s => autoScrollObserver.observe(s));
 
     /* dev helper: ?goto=N jumps istantly to section N (per screenshot/QA) */
     const goto = new URLSearchParams(location.search).get('goto');
@@ -463,7 +436,7 @@
       video.addEventListener('ended', () => {
         if (!autoAdvanced) {
           autoAdvanced = true;
-          scheduleAdvanceFrom(0);
+          sections[1].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
         }
       });
 
@@ -472,7 +445,6 @@
         entries.forEach((e) => {
           if (e.isIntersecting) {
             autoAdvanced = false;
-            clearAutoScroll();
             video.currentTime = 0;
             video.play().catch(() => {});
           } else {
