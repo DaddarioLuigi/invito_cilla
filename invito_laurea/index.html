@@ -112,6 +112,18 @@
       50%     { transform: translateX(-50%) translateY(4px); }
     }
     .scroll-hint { animation: floaty 2.4s ease-in-out infinite; }
+    .scroll-hint--light {
+      color: var(--gold-ink);
+      text-shadow: none;
+      filter: none;
+      opacity: .88;
+    }
+    .map-section .scroll-hint {
+      bottom: max(6.4rem, calc(env(safe-area-inset-bottom) + 4.2rem));
+      color: var(--ink);
+      text-shadow: 0 1px 8px rgba(255,255,255,.85);
+      filter: drop-shadow(0 2px 6px rgba(255,255,255,.6));
+    }
 
     /* ---- Tipografia ---- */
     .content {
@@ -255,7 +267,6 @@
         <source src="assets/invito.mp4" type="video/mp4">
       </video>
       <div class="scroll-hint" aria-hidden="true">
-        <span>scorri</span>
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 7l6 6 6-6"/>
           <path d="M6 13l6 6 6-6"/>
@@ -279,6 +290,13 @@
         <img class="laurel-divider reveal d1" src="assets/laurel-divider.svg" alt="" aria-hidden="true">
         <h1 class="headline reveal d2">Festeggia<br>con me</h1>
       </div>
+      <div class="scroll-hint scroll-hint--light" aria-hidden="true">
+        <span>scorri</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 7l6 6 6-6"/>
+          <path d="M6 13l6 6 6-6"/>
+        </svg>
+      </div>
     </section>
 
     <!-- 3 · Data -->
@@ -295,6 +313,13 @@
         <img class="laurel-divider reveal d1" src="assets/laurel-divider.svg" alt="" aria-hidden="true">
         <p class="date reveal d2"><span class="day">01</span> agosto<span class="time">20:30</span></p>
       </div>
+      <div class="scroll-hint scroll-hint--light" aria-hidden="true">
+        <span>scorri</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 7l6 6 6-6"/>
+          <path d="M6 13l6 6 6-6"/>
+        </svg>
+      </div>
     </section>
 
     <!-- 4 · Luogo -->
@@ -310,6 +335,13 @@
         <p class="kicker reveal">Dove</p>
         <img class="laurel-divider reveal d1" src="assets/laurel-divider.svg" alt="" aria-hidden="true">
         <p class="place reveal d2">Villa<br>Romanazzi<span class="city">Bari</span></p>
+      </div>
+      <div class="scroll-hint scroll-hint--light" aria-hidden="true">
+        <span>scorri</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 7l6 6 6-6"/>
+          <path d="M6 13l6 6 6-6"/>
+        </svg>
       </div>
     </section>
 
@@ -328,6 +360,13 @@
         <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Apri con Google Maps
       </a>
+      <div class="scroll-hint" aria-hidden="true">
+        <span>scorri</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 7l6 6 6-6"/>
+          <path d="M6 13l6 6 6-6"/>
+        </svg>
+      </div>
     </section>
 
   </main>
@@ -335,14 +374,20 @@
   <script>
     const scroller = document.querySelector('.snap');
     const sections = [...document.querySelectorAll('.snap > section')];
-    const scrollHint = document.querySelector('.scroll-hint');
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (scrollHint) {
-      scroller.addEventListener('scroll', () => {
-        scrollHint.classList.toggle('hidden', scroller.scrollTop > 48);
-      }, { passive: true });
-    }
+    sections.forEach((section, index) => {
+      const hint = section.querySelector('.scroll-hint');
+      if (!hint) return;
+      if (index === sections.length - 1) {
+        hint.classList.add('hidden');
+        return;
+      }
+      const hintObserver = new IntersectionObserver(([entry]) => {
+        hint.classList.toggle('hidden', !entry.isIntersecting);
+      }, { root: scroller, threshold: 0.55 });
+      hintObserver.observe(section);
+    });
 
     /* dev helper: ?goto=N jumps istantly to section N (per screenshot/QA) */
     const goto = new URLSearchParams(location.search).get('goto');
