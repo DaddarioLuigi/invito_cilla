@@ -90,16 +90,28 @@
       position: absolute; left: 50%;
       bottom: max(2.2rem, env(safe-area-inset-bottom));
       transform: translateX(-50%); z-index: 2;
-      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      display: flex; flex-direction: column; align-items: center; gap: .55rem;
       color: #fff; letter-spacing: .28em; font-size: .72rem;
-      text-transform: uppercase; opacity: .9;
-      animation: floaty 2.4s ease-in-out infinite;
+      text-transform: uppercase; opacity: .95;
+      text-shadow: 0 1px 10px rgba(0,0,0,.55);
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.4));
+      pointer-events: none;
+      transition: opacity .45s ease, visibility .45s ease;
     }
-    .scroll-hint svg { width: 20px; height: 20px; stroke: currentColor; }
+    .scroll-hint.hidden { opacity: 0; visibility: hidden; }
+    .scroll-hint svg {
+      width: 30px; height: 30px; stroke: currentColor;
+      animation: bounce-down 2s ease-in-out infinite;
+    }
+    @keyframes bounce-down {
+      0%, 100% { transform: translateY(0); opacity: .75; }
+      50%      { transform: translateY(9px); opacity: 1; }
+    }
     @keyframes floaty {
       0%,100% { transform: translateX(-50%) translateY(0); }
-      50%     { transform: translateX(-50%) translateY(7px); }
+      50%     { transform: translateX(-50%) translateY(4px); }
     }
+    .scroll-hint { animation: floaty 2.4s ease-in-out infinite; }
 
     /* ---- Tipografia ---- */
     .content {
@@ -228,6 +240,7 @@
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
       .scroll-hint { animation: none; }
+      .scroll-hint svg { animation: none; opacity: .9; }
       .spk { animation: none; opacity: .7; transform: scale(.9); }
       .snap { scroll-behavior: auto; }
     }
@@ -243,7 +256,10 @@
       </video>
       <div class="scroll-hint" aria-hidden="true">
         <span>scorri</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 7l6 6 6-6"/>
+          <path d="M6 13l6 6 6-6"/>
+        </svg>
       </div>
     </section>
 
@@ -319,7 +335,14 @@
   <script>
     const scroller = document.querySelector('.snap');
     const sections = [...document.querySelectorAll('.snap > section')];
+    const scrollHint = document.querySelector('.scroll-hint');
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (scrollHint) {
+      scroller.addEventListener('scroll', () => {
+        scrollHint.classList.toggle('hidden', scroller.scrollTop > 48);
+      }, { passive: true });
+    }
 
     /* dev helper: ?goto=N jumps istantly to section N (per screenshot/QA) */
     const goto = new URLSearchParams(location.search).get('goto');
