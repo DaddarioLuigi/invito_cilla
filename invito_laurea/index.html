@@ -385,6 +385,38 @@
       hintObserver.observe(section);
     });
 
+    /* ---- Auto-scroll tra sezioni ---- */
+    const AUTO_SCROLL_MS = 1500;
+    let autoScrollTimer = null;
+
+    function clearAutoScroll() {
+      if (autoScrollTimer) {
+        clearTimeout(autoScrollTimer);
+        autoScrollTimer = null;
+      }
+    }
+
+    function scheduleAdvanceFrom(sectionIndex) {
+      clearAutoScroll();
+      if (reduceMotion || sectionIndex >= sections.length - 1) return;
+
+      autoScrollTimer = setTimeout(() => {
+        sections[sectionIndex + 1].scrollIntoView({
+          behavior: reduceMotion ? 'auto' : 'smooth',
+          block: 'start'
+        });
+      }, AUTO_SCROLL_MS);
+    }
+
+    const autoScrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const index = sections.indexOf(e.target);
+        if (index > 0) scheduleAdvanceFrom(index);
+      });
+    }, { root: scroller, threshold: 0.6 });
+    sections.slice(1).forEach(s => autoScrollObserver.observe(s));
+
     /* dev helper: ?goto=N jumps istantly to section N (per screenshot/QA) */
     const goto = new URLSearchParams(location.search).get('goto');
     if (goto !== null && sections[+goto]) {
@@ -429,17 +461,23 @@
 
       let autoAdvanced = false;
       video.addEventListener('ended', () => {
-        if (!autoAdvanced) {                     // avanza una sola volta, senza "intrappolare"
+        if (!autoAdvanced) {
           autoAdvanced = true;
-          sections[1].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+          scheduleAdvanceFrom(0);
         }
       });
 
       /* Rigioca il video (con audio) tornando sulla prima sezione */
       const vObserver = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
-          if (e.isIntersecting) { video.currentTime = 0; video.play().catch(() => {}); }
-          else video.pause();
+          if (e.isIntersecting) {
+            autoAdvanced = false;
+            clearAutoScroll();
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
         });
       }, { root: scroller, threshold: 0.6 });
       vObserver.observe(sections[0]);
